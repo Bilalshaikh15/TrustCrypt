@@ -1,8 +1,11 @@
 import ModalComponent from "../Modal";
 import { ethers } from "ethers";
-
+import { pinDataToIPFS } from "../../lib/pinDataToIPFS";
+import LitJsSdk from "@lit-protocol/sdk-browser";
 import { execute_raw_transaction } from "../../hooks/useOkto";
 import { useState } from "react";
+import Lit from "../../lib/lit";
+const lit = new Lit({ autoConnect: true });
 const contractABI = [
   {
     anonymous: false,
@@ -153,7 +156,7 @@ const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS; // Replace with y
 
 const Index = ({ modalStatus, wallet, authToken }) => {
   const [isModalOpen, setModalOpen] = modalStatus;
-  const [addModalData, setAddModalData] = useState({
+  const [credentials, setCredentials] = useState({
     siteURL: null,
     username: null,
     password: null,
@@ -184,24 +187,109 @@ const Index = ({ modalStatus, wallet, authToken }) => {
     };
     return transactionData;
   };
-  generateTxnData();
+  // generateTxnData();
   const handleAddPassword = async () => {
     console.log("wallet", wallet);
-    const { api_key, auth, network_name, from, to, tx_data, value } =
+    const auth =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2luZGN4X2lkIjoiMGFmZTdhYjMtNDI2NS00M2UxLTliYmItNGQxZTU5NzY5MmJmIiwidXNlcl9pZCI6IjBhZmU3YWIzLTQyNjUtNDNlMS05YmJiLTRkMWU1OTc2OTJiZiIsInNoYXJlZF9pZCI6bnVsbCwicG9ydGZvbGlvRmFjdG9yIjoiMSIsInNlc3Npb25JZCI6IjhiZDg1YWRjLWQ1ODQtNGE0My1hMDZkLTY2Nzk2ZDJhNmM3YiIsInVzZXJfbG9naW5fdmVuZG9yX2lkIjoiZGJhZGYyYTctMzk0OC00MmY3LThkYjgtODQxMzdmNTk4YmVjIiwicyI6IndlYiIsInVzZXJBZ2VudCI6IkdvLWh0dHAtY2xpZW50LzEuMSIsInNpcCI6Ijo6ZmZmZjoxMjcuMC4wLjYiLCJsb2dpbl9tZWRpdW0iOiJHX0FVVEgiLCJpYXQiOjE3MDIxMzYzMjksImV4cCI6MTcwMzAwMDMyOX0.JFugilxv8UdLm9FOBgUnpISHiYQU7uaahgjoizpl8e0";
+    // TODO: remove auth hardcoded
+    const { api_key, network_name, from, to, tx_data, value } =
       await generateTxnData();
     console.log("🚀  beforeeeee:");
 
-    const res = await execute_raw_transaction(
-      api_key,
-      auth,
-      network_name,
-      from,
-      to,
-      tx_data,
-      value
-    );
+    try {
+      const credentialsString = JSON.stringify(credentials);
+      console.log("credentialsString", credentialsString);
+      const { encryptedString, encryptedSymmetricKey } =
+        await lit.encryptString(credentialsString, accessControlConditions);
+      console.log("encryptedString", encryptedString);
+      console.log("acls-->", accessControlConditions);
+      // save encryptedString and encryptedSymmetricKey to ipfs
+      // convert stringblob to base64 string
+      const encryptedStringBase64 = await LitJsSdk.blobToBase64String(
+        encryptedString
+      );
+      console.log("encryptedStringBase64", encryptedStringBase64);
+      console.log("encryptedSymmetricKey", encryptedSymmetricKey);
+      const response = await pinDataToIPFS({
+        encryptedString: encryptedStringBase64,
+        encryptedSymmetricKey,
+      });
+      console.log("response", response);
+      setLogMessage(
+        `Credentials encrypted and saved to IPFS: ${response.IpfsHash}`
+      );
+      setLog({
+        type: "info",
+        message: "Credentials encrypted and saved to IPFS",
+        description: response.IpfsHash,
+      });
+      console.log("Save/Update Ipfs hash-->", response.IpfsHash);
+      // save ipfs hash to smart contract
+      if (credentials?.id) {
+        // update
+        const tx = await contract.updateKey(credentials.id, response.IpfsHash);
+        console.log("Update Tx-->", tx.hash);
+        setLog({
+          type: "info",
+          message: "Credentials update submitted. waiting for confirmation",
+          description: tx.hash,
+        });
+        await tx.wait();
+        setLoading(false);
+        setIsEditModalOpen(false);
+        // refresh credentials after 20 seconds
+        setTimeout(() => {
+          console.log("Refreshing credentials");
+          getCredentials();
+        }, 20000);
+        return setLog({
+          type: "success",
+          message: "Credentials updated successfully",
+          description: "Refreshes in 20 seconds..",
+        });
+      }
+      const tx = await contract.addKey(response.IpfsHash);
+      console.log("Add Tx-->", tx.hash);
+      setLog({
+        type: "info",
+        message: "Transaction submitted. Waiting for confirmation.",
+        description: tx.hash,
+      });
+      await tx.wait();
+      setLog({
+        type: "success",
+        message: "Credentials saved successfully",
+        description: "Refreshes in 20 seconds..",
+      });
+      setIsAddModalOpen(false);
+      setLoading(false);
+      // refresh credentials after 20 seconds
+      setTimeout(() => {
+        console.log("Refreshing credentials");
+        getCredentials();
+      }, 20000);
+    } catch (error) {
+      console.log("Something went wrong While saving credentials", error);
+      setLog({
+        type: "error",
+        message: "Something went wrong While saving credentials",
+        description: error.message,
+      });
+      setLoading(false);
+    }
 
-    console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
+    // const res = await execute_raw_transaction(
+    //   api_key,
+    //   auth,
+    //   network_name,
+    //   from,
+    //   to,
+    //   tx_data,
+    //   value
+    // );
+
+    // console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
   };
   return (
     <ModalComponent modalStatus={[isModalOpen, setModalOpen]}>
@@ -214,25 +302,24 @@ const Index = ({ modalStatus, wallet, authToken }) => {
             className=" px-3 border-black"
             type="text"
             placeholder="Site Name"
-            // onChange={(e) =>
-            //   setAddModalData({
-            //     siteURL: e.target.value,
-            //     ...addModalData,
-            //   })
-            // }
+            onChange={(e) =>
+              setCredentials({
+                siteURL: e.target.value,
+                ...credentials,
+              })
+            }
           />
         </div>
         <div className="py-5">
           {" "}
           Username :
           <input
-            // onChange={(e) =>
-            //   // setAddModalData({
-            //   //   username: e.target.value,
-            //   //   ...addModalData,
-            //   // })
-            //   {}
-            // }
+            onChange={(e) =>
+              setCredentials({
+                username: e.target.value,
+                ...credentials,
+              })
+            }
             className=" px-3"
             type="text"
             placeholder="username"
@@ -242,12 +329,12 @@ const Index = ({ modalStatus, wallet, authToken }) => {
           {" "}
           Password :
           <input
-            // onChange={(e) =>
-            //   setAddModalData({
-            //     password: e.target.value,
-            //     ...addModalData,
-            //   })
-            // }
+            onChange={(e) =>
+              setCredentials({
+                password: e.target.value,
+                ...credentials,
+              })
+            }
             className=" px-3"
             type="text"
             placeholder="Password"
