@@ -36,7 +36,6 @@ function Index() {
           VITE_OKTO_PIN
         );
       const wallets = await create_wallet(VITE_OKTO_API_KEY, auth_token);
-      console.log(wallets);
       setWallet(wallets[0]);
     } catch (err) {
       console.log("Error connecting wallet", err);
@@ -61,7 +60,7 @@ function Index() {
             {isAddModalOpen ? (
               <AddPassword
                 value={[isAddModalOpen, setIsAddModalOpen]}
-                wallet={wallet}
+                wallet={wallet[0]}
               />
             ) : null}
             {isEditModalOpen ? (

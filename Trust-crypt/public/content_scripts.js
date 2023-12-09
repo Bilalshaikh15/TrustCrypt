@@ -1,7 +1,12 @@
 /* eslint-disable no-undef */
 let tried = false;
 let new_msg = false;
-
+const abi = [
+  "function addKey(string _ipfsHash)",
+  "function getMyKeys() view returns (tuple(uint256 id, string ipfsHash, bool isDeleted)[])",
+  "function softDeleteKey(uint256 _id)",
+  "function updateKey(uint256 _id, string _ipfsHash)",
+];
 const on_load = () => {
   const username_element =
     document.querySelector("input#email") ||

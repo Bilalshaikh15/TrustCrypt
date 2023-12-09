@@ -2,8 +2,8 @@ import "react-responsive-modal/styles.css";
 import { Modal } from "react-responsive-modal";
 import { useState } from "react";
 
-const ModalComponent = ({ value, children }) => {
-  const [isModalOpen] = useState(value);
+const ModalComponent = ({ modalStatus, children }) => {
+  const [isModalOpen] = useState(modalStatus);
   return (
     <Modal
       open={isModalOpen}
