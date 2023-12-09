@@ -155,7 +155,7 @@ const Index = ({ modalStatus, wallet, authToken }) => {
     username: null,
     password: null,
   });
-  console.log("wallet ===", wallet);
+  // console.log("wallet ===", wallet);
   const generateTxnData = async () => {
     // Encode the function call
     const iface = new ethers.utils.Interface(contractABI);
@@ -182,18 +182,17 @@ const Index = ({ modalStatus, wallet, authToken }) => {
       await generateTxnData();
     console.log("🚀  beforeeeee:");
 
+    const res = await execute_raw_transaction(
+      api_key,
+      auth,
+      network_name,
+      from,
+      to,
+      tx_data,
+      value
+    );
 
-    // const res = await execute_raw_transaction(
-    //   api_key,
-    //   auth,
-    //   network_name,
-    //   from,
-    //   to,
-    //   tx_data,
-    //   value
-    // );
-
-    // console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
+    console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
   };
   return (
     <ModalComponent modalStatus={[isModalOpen, setModalOpen]}>
