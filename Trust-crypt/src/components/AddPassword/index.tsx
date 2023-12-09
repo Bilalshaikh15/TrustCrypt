@@ -1,8 +1,21 @@
 import ModalComponent from "../Modal";
+// import { execute_raw_transaction } from "../../hooks/useOkto";
 
 const Index = ({ value, wallet }) => {
   const [isModalOpen, setModalOpen] = value;
+  const handleAddPassword = () => {
+    console.log("wallet", wallet);
 
+    // execute_raw_transaction(
+    //     import.meta.env.VITE_OKTO_API_KEY,
+    //   auth,
+    //   network_name,
+    //   from,
+    //   to,
+    //   tx_data,
+    //   value
+    // );
+  };
   return (
     <ModalComponent value={[isModalOpen, setModalOpen]}>
       <div className="w-60 h-30">
@@ -34,7 +47,10 @@ const Index = ({ value, wallet }) => {
         >
           cancel
         </button>
-        <button className=" float-right text-right bg-green-500 p-2 rounded-xl">
+        <button
+          onClick={handleAddPassword}
+          className=" float-right text-right bg-green-500 p-2 rounded-xl"
+        >
           Add
         </button>
       </div>

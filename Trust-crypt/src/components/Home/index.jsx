@@ -26,21 +26,6 @@ function Index() {
   chrome.runtime.onMessage.addListener((data) => {
     console.log("log from opo", data);
   });
-  // useEffect(() => {
-  //   if (provider) {
-  //     console.log("window.ethereum", window.ethereum);
-  //     window.ethereum.on("accountsChanged", () => window.location.reload());
-  //     window.ethereum.on("chainChanged", () => window.location.reload());
-  //     window.ethereum.on("connect", (info) =>
-  //       console.log("connected to network", info)
-  //     );
-  //   }
-  //   return () => {
-  //     if (provider) {
-  //       window.ethereum.removeAllListeners();
-  //     }
-  //   };
-  // }, [provider]);
 
   const handleConnectWallet = async () => {
     try {
