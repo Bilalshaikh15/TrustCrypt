@@ -60,7 +60,7 @@ function Index() {
             {isAddModalOpen ? (
               <AddPassword
                 value={[isAddModalOpen, setIsAddModalOpen]}
-                wallet={wallet[0]}
+                wallet={wallet}
               />
             ) : null}
             {isEditModalOpen ? (

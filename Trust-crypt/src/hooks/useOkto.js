@@ -13,7 +13,7 @@ export async function authenticate(api_key, idToken, pin) {
       },
     }
   );
-  console.log(authData);
+  //   console.log(authData);
   const token = authData.token;
   // user signup flow
   if (token) {
@@ -37,7 +37,7 @@ export async function authenticate(api_key, idToken, pin) {
   }
   // user login flow
   const { auth_token, refresh_auth_token, device_token } = authData.data;
-  console.log(auth_token, refresh_auth_token, device_token);
+  //   console.log(auth_token, refresh_auth_token, device_token);
   return { auth_token, refresh_auth_token, device_token };
 }
 
@@ -53,7 +53,7 @@ export async function create_wallet(api_key, auth) {
       },
     }
   );
-  console.log(data.data);
+  //   console.log(data.data);
   const { wallets } = data.data;
   return wallets;
 }

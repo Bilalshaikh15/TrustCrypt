@@ -5,8 +5,8 @@ async function getCurrentTab() {
   return tab;
 }
 function sendWindowObjectFromContentScript() {
-  console.log("before timeout", window);
-  console.log("window.ether", window.ethereum);
+  // console.log("before timeout", window);
+  // console.log("window.ether", window.ethereum);
 
   // Inform the background page that
   // this tab should have a page-action.
@@ -46,11 +46,11 @@ try {
 
   chrome.runtime.onInstalled.addListener(function () {
     //some other code here
-    console.log("Installed");
+    // console.log("Installed");
     const tab = getCurrentTab()
       .then((tab) => {
-        console.log("tab", tab);
-        console.log("tab.id", tab.id);
+        // console.log("tab", tab);
+        // console.log("tab.id", tab.id);
 
         return tab.id;
       })

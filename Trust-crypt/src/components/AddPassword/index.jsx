@@ -38,29 +38,11 @@ const Index = ({ modalStatus, wallet }) => {
       tx_data: generatedTxData,
       value: JSON.stringify(addModalData),
     };
-    // const res = execute_raw_transaction(transactionData);
-    // console.log(res);
-
-    // // Create the transaction object
-    // const tx = {
-    //   to: contractAddress,
-    //   data: data,
-    //   nonce: await signer.getTransactionCount(),
-    //   gasLimit: ethers.utils.hexlify(300000), // Set gas limit
-    //   gasPrice: ethers.utils.parseUnits("50", "gwei"), // Set gas price
-    // };
-
-    // // Sign the transaction
-    // const signedTx = await signer.signTransaction(tx);
-
-    // // Send the transaction
-    // const txResponse = await provider.sendTransaction(signedTx);
-    // console.log("Transaction hash:", txResponse.hash);
   };
-  generateTxnData();
-  const handleAddPassword = () => {
-    console.log("wallet", wallet);
 
+  const handleAddPassword = async () => {
+    console.log("wallet", wallet);
+    await generateTxnData();
     // execute_raw_transaction(
     //     import.meta.env.VITE_OKTO_API_KEY,
     //   auth,
@@ -82,12 +64,12 @@ const Index = ({ modalStatus, wallet }) => {
             className=" px-3 border-black"
             type="text"
             placeholder="Site Name"
-            onChange={(e) =>
-              setAddModalData({
-                siteURL: e.target.value,
-                ...addModalData,
-              })
-            }
+            // onChange={(e) =>
+            //   setAddModalData({
+            //     siteURL: e.target.value,
+            //     ...addModalData,
+            //   })
+            // }
           />
         </div>
         <div className="py-5">
@@ -95,10 +77,11 @@ const Index = ({ modalStatus, wallet }) => {
           Username :
           <input
             onChange={(e) =>
-              setAddModalData({
-                username: e.target.value,
-                ...addModalData,
-              })
+              // setAddModalData({
+              //   username: e.target.value,
+              //   ...addModalData,
+              // })
+              {}
             }
             className=" px-3"
             type="text"
@@ -109,12 +92,12 @@ const Index = ({ modalStatus, wallet }) => {
           {" "}
           Password :
           <input
-            onChange={(e) =>
-              setAddModalData({
-                password: e.target.value,
-                ...addModalData,
-              })
-            }
+            // onChange={(e) =>
+            //   setAddModalData({
+            //     password: e.target.value,
+            //     ...addModalData,
+            //   })
+            // }
             className=" px-3"
             type="text"
             placeholder="Password"
