@@ -3,7 +3,7 @@ import axios from "axios";
 // 1. Call `/api/v1/authenticate` endpoint to get an access token
 export async function authenticate(api_key, idToken, pin) {
   let { data: authData } = await axios.post(
-    `https://3p-bff.oktostage.com/api/v1/authenticate/`,
+    `https://3p-bff.oktostage.com/api/v1/authenticate`,
     {
       id_token: idToken,
     },
@@ -58,15 +58,25 @@ export async function create_wallet(api_key, auth) {
   return wallets;
 }
 
-export async function execute_raw_transaction({
+export async function execute_raw_transaction(
   api_key,
   auth,
   network_name,
   from,
   to,
   tx_data,
-  value,
-}) {
+  value
+) {
+  console.log(
+    "within the OKto functuion",
+    auth,
+    network_name,
+    from,
+    to,
+    tx_data,
+    value,
+    api_key
+  );
   const { data } = await axios.post(
     `https://3p-bff.oktostage.com/api/v1/rawtransaction/execute`,
     {

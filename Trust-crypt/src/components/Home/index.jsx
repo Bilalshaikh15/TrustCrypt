@@ -22,6 +22,7 @@ function Index() {
   const [account, setAccount] = useState(null);
   const [editingCredentials, setEditingCredentials] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [authToken, setAuthToken] = useState(null);
 
   chrome.runtime.onMessage.addListener((data) => {
     console.log("log from opo", data);
@@ -37,6 +38,7 @@ function Index() {
         );
       const wallets = await create_wallet(VITE_OKTO_API_KEY, auth_token);
       setWallet(wallets[0]);
+      setAuthToken(auth_token);
     } catch (err) {
       console.log("Error connecting wallet", err);
       setLog({
@@ -49,25 +51,26 @@ function Index() {
   return (
     <>
       <div className="w-[350px] h-[600px]">
-        {!wallet ? (
+        {/* {!wallet ? (
           <button type="primary" onClick={handleConnectWallet}>
             Connect Wallet
           </button>
-        ) : (
-          <>
-            <Header setIsAddModalOpen={setIsAddModalOpen} />
-            <PasswordList setIsEditModalOpen={setIsEditModalOpen} />
-            {isAddModalOpen ? (
-              <AddPassword
-                value={[isAddModalOpen, setIsAddModalOpen]}
-                wallet={wallet}
-              />
-            ) : null}
-            {isEditModalOpen ? (
-              <EditPassword value={[isEditModalOpen, setIsEditModalOpen]} />
-            ) : null}
-          </>
-        )}
+        ) : ( */}
+        <>
+          <Header setIsAddModalOpen={setIsAddModalOpen} />
+          <PasswordList setIsEditModalOpen={setIsEditModalOpen} />
+          {isAddModalOpen ? (
+            <AddPassword
+              modalStatus={[isAddModalOpen, setIsAddModalOpen]}
+              wallet={wallet}
+              authToken={authToken}
+            />
+          ) : null}
+          {isEditModalOpen ? (
+            <EditPassword modalStatus={[isEditModalOpen, setIsEditModalOpen]} />
+          ) : null}
+        </>
+        {/* )} */}
       </div>
     </>
   );
