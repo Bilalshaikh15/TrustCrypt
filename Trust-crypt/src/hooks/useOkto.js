@@ -2,6 +2,7 @@ import axios from "axios";
 
 // 1. Call `/api/v1/authenticate` endpoint to get an access token
 export async function authenticate(api_key, idToken, pin) {
+  // console.log("authenticate", api_key, idToken, pin);
   let { data: authData } = await axios.post(
     `https://3p-bff.oktostage.com/api/v1/authenticate`,
     {
@@ -13,8 +14,7 @@ export async function authenticate(api_key, idToken, pin) {
       },
     }
   );
-  //   console.log(authData);
-  const token = authData.token;
+  const token = authData.data.token;
   // user signup flow
   if (token) {
     console.log("from if");
@@ -32,12 +32,13 @@ export async function authenticate(api_key, idToken, pin) {
         },
       }
     );
-    const { auth_token, refresh_auth_token, device_token } = data;
+    // console.log("IF", data);
+    const { auth_token, refresh_auth_token, device_token } = data.data;
     return { auth_token, refresh_auth_token, device_token };
   }
+  // console.log("authData", authData);
   // user login flow
   const { auth_token, refresh_auth_token, device_token } = authData.data;
-  //   console.log(auth_token, refresh_auth_token, device_token);
   return { auth_token, refresh_auth_token, device_token };
 }
 

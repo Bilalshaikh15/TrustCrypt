@@ -51,26 +51,26 @@ function Index() {
   return (
     <>
       <div className="w-[350px] h-[600px]">
-        {/* {!wallet ? (
+        {!wallet ? (
           <button type="primary" onClick={handleConnectWallet}>
             Connect Wallet
           </button>
-        ) : ( */}
-        <>
-          <Header setIsAddModalOpen={setIsAddModalOpen} />
-          <PasswordList setIsEditModalOpen={setIsEditModalOpen} />
-          {isAddModalOpen ? (
-            <AddPassword
-              modalStatus={[isAddModalOpen, setIsAddModalOpen]}
-              wallet={wallet}
-              authToken={authToken}
-            />
-          ) : null}
-          {isEditModalOpen ? (
-            <EditPassword modalStatus={[isEditModalOpen, setIsEditModalOpen]} />
-          ) : null}
-        </>
-        {/* )} */}
+        ) : (
+          <>
+            <Header setIsAddModalOpen={setIsAddModalOpen} />
+            <PasswordList setIsEditModalOpen={setIsEditModalOpen} />
+            {isAddModalOpen ? (
+              <AddPassword
+                modalStatus={[isAddModalOpen, setIsAddModalOpen]}
+                wallet={wallet}
+                authToken={authToken}
+              />
+            ) : null}
+            {isEditModalOpen ? (
+              <EditPassword modalStatus={[isEditModalOpen, setIsEditModalOpen]} />
+            ) : null}
+          </>
+        )}
       </div>
     </>
   );
