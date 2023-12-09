@@ -1,66 +1,69 @@
-// async function getCurrentTab() {
-//   let queryOptions = { active: false, lastFocusedWindow: true };
-//   // `tab` will either be a `tabs.Tab` instance or `undefined`.
-//   let [tab] = await chrome.tabs.query(queryOptions);
-//   return tab;
-// }
+async function getCurrentTab() {
+  let queryOptions = { active: false, lastFocusedWindow: true };
+  // `tab` will either be a `tabs.Tab` instance or `undefined`.
+  let [tab] = await chrome.tabs.query(queryOptions);
+  return tab;
+}
+function sendWindowObjectFromContentScript() {
+  console.log("before timeout", window);
+  console.log("window.ether", window.ethereum);
 
-// function sendWindowObjectToPopup() {
-//   console.log("before timeout", window);
-//   console.log("window.ether", window.ethereum);
-//   console.log(chrome);
-// }
+  // Inform the background page that
+  // this tab should have a page-action.
+  chrome.runtime.sendMessage({
+    from: "content",
+    subject: "showPageAction",
+  });
+
+  // Listen for messages from the popup.
+  chrome.runtime.onMessage.addListener((msg, sender, response) => {
+    // First, validate the message's structure.
+    if (msg.from === "popup" && msg.subject === "DOMInfo") {
+      // Collect the necessary data.
+      // (For your specific requirements `document.querySelectorAll(...)`
+      //  should be equivalent to jquery's `$(...)`.)
+      var domInfo = {
+        total: document.querySelectorAll("*").length,
+        inputs: document.querySelectorAll("input").length,
+        buttons: document.querySelectorAll("button").length,
+      };
+
+      // Directly respond to the sender (popup),
+      // through the specified callback.
+      response(domInfo);
+    }
+  });
+}
 
 try {
-  // chrome.action.addListener(function () {
-  // if (reason === 'install') {
-  //   chrome.tabs.create({
-  //     url: "onboarding.html"
-  //   });
-  // }
-  //some other code here
-  //   console.log("Installed");
-  //   const tab = getCurrentTab()
-  //     .then((tab) => {
-  //       console.log("tab", tab);
-  //       console.log("tab.id", tab.id);
+  chrome.runtime.onMessage.addListener((msg, sender) => {
+    // First, validate the message's structure.
+    if (msg.from === "content" && msg.subject === "showPageAction") {
+      // Enable the page-action for the requesting tab.
+      chrome.pageAction.show(sender.tab.id);
+    }
+  });
 
-  //       return tab.id;
-  //     })
-  //     .then((tabId) => {
-  //       chrome.scripting
-  //         .executeScript({
-  //           target: { tabId },
-  //           world: "MAIN",
-  //           func: sendWindowObjectToPopup,
-  //         })
-  //         .then(() => console.log("script injected"));
-  //     });
-  // });
+  chrome.runtime.onInstalled.addListener(function () {
+    //some other code here
+    console.log("Installed");
+    const tab = getCurrentTab()
+      .then((tab) => {
+        console.log("tab", tab);
+        console.log("tab.id", tab.id);
 
-  // chrome.runtime.onConnect.addListener(function (port) {
-  //   console.assert(port.name === "knockknock");
-  //   port.onMessage.addListener(function (msg) {
-  //     if (msg.joke === "Knock knock")
-  //       port.postMessage({ question: "Who's there?" });
-  //     else if (msg.answer === "Madame")
-  //       port.postMessage({ question: "Madame who?" });
-  //     else if (msg.answer === "Madame... Bovary")
-  //       port.postMessage({ question: "I don't get it." });
-  //   });
-  // });
-
-  // chrome.runtime.onMessageExternal.addListener(
-  //   function (request, sender, sendResponse) {
-  //     if (sender.id === blocklistedExtension)
-  //       return;  // don't allow this extension access
-  //     else if (request.getTargetData)
-  //       sendResponse({ targetData: targetData });
-  //     else if (request.activateLasers) {
-  //       var success = activateLasers();
-  //       sendResponse({ activateLasers: success });
-  //     }
-  //   });
+        return tab.id;
+      })
+      .then((tabId) => {
+        chrome.scripting
+          .executeScript({
+            target: { tabId },
+            world: "MAIN",
+            func: sendWindowObjectFromContentScript,
+          })
+          .then(() => console.log("script injected"));
+      });
+  });
   chrome.runtime.onMessage.addListener(function (
     message,
     sender,

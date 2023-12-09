@@ -3,6 +3,10 @@ import PasswordList from "@/components/PasswordList";
 import { useState, useEffect } from "react";
 import AddPassword from "@/components/AddPassword";
 import EditPassword from "@/components/EditPassword";
+import { authenticate, create_wallet } from "../../hooks/useOkto";
+const VITE_OKTO_API_KEY = import.meta.env.VITE_OKTO_API_KEY;
+const VITE_OKTO_OAUTH_ID_TOKEN = import.meta.env.VITE_OKTO_OAUTH_ID_TOKEN;
+const VITE_OKTO_PIN = import.meta.env.VITE_OKTO_PIN;
 
 function Index() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -13,6 +17,7 @@ function Index() {
   const [log, setLog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState(null);
+  const [wallet, setWallet] = useState(null);
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState(null);
   const [editingCredentials, setEditingCredentials] = useState("");
@@ -39,45 +44,15 @@ function Index() {
 
   const handleConnectWallet = async () => {
     try {
-      if (window?.ethereum) {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        console.log("Using account: ", accounts[0]);
-        const provider = new Web3Provider(window.ethereum);
-        const { chainId } = await provider.getNetwork();
-        if (chainId !== 80001) {
-          setLog({
-            type: "info",
-            message: "Switching to Polygon Mumbai Testnet",
-            description: "Please connect to Mumbai Testnet",
-          });
-          // switch to the polygon testnet
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x13881" }],
-          });
-        }
-        console.log("chainId:", chainId);
-        setProvider(provider);
-        setAccount(accounts[0]);
-        const signer = provider.getSigner();
-        const contract = new Contract(contractAddress, abi, signer);
-        setContract(contract);
-        setLog({
-          type: "info",
-          message: "Wallet connected successfully",
-          description: "",
-        });
-      } else {
-        console.log("Please use Web3 enabled browser");
-        console.log("provider code", provider);
-        setLog({
-          type: "error",
-          message: "Please use Web3 enabled browser",
-          description: "",
-        });
-      }
+      const { auth_token, refresh_auth_token, device_token } =
+        await authenticate(
+          VITE_OKTO_API_KEY,
+          VITE_OKTO_OAUTH_ID_TOKEN,
+          VITE_OKTO_PIN
+        );
+      const wallets = await create_wallet(VITE_OKTO_API_KEY, auth_token);
+      console.log(wallets);
+      setWallet(wallets[0]);
     } catch (err) {
       console.log("Error connecting wallet", err);
       setLog({
@@ -90,7 +65,7 @@ function Index() {
   return (
     <>
       <div className="w-[350px] h-[600px]">
-        {provider ? (
+        {!wallet ? (
           <button type="primary" onClick={handleConnectWallet}>
             Connect Wallet
           </button>
@@ -99,7 +74,10 @@ function Index() {
             <Header setIsAddModalOpen={setIsAddModalOpen} />
             <PasswordList setIsEditModalOpen={setIsEditModalOpen} />
             {isAddModalOpen ? (
-              <AddPassword value={[isAddModalOpen, setIsAddModalOpen]} />
+              <AddPassword
+                value={[isAddModalOpen, setIsAddModalOpen]}
+                wallet={wallet}
+              />
             ) : null}
             {isEditModalOpen ? (
               <EditPassword value={[isEditModalOpen, setIsEditModalOpen]} />
