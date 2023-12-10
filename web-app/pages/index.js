@@ -423,6 +423,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        <h1 className="text-8xl">Trust-Crypt</h1>
         {
           showDescription ? <>
             <h3 className={styles.title}>
