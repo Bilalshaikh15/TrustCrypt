@@ -423,9 +423,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1 className="text-8xl">Trust-Crypt</h1>
+
         {
           showDescription ? <>
+            <h1 className="text-8xl">Trust-Crypt</h1>
             <h3 className={styles.title}>
               Welcome to the <span> ONLY Decentralized Password Manager</span>
             </h3>
