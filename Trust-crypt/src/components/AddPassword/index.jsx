@@ -151,11 +151,9 @@ const contractABI = [
 ];
 const Index = ({ modalStatus, wallet, authToken }) => {
   const [isModalOpen, setModalOpen] = modalStatus;
-  const [credentials, setCredentials] = useState({
-    siteURL: null,
-    username: null,
-    password: null,
-  });
+  const [siteURL, setSiteURL] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   // console.log("wallet ===", wallet);
   const generateTxnData = (ipfsHash) => {
@@ -205,28 +203,25 @@ const Index = ({ modalStatus, wallet, authToken }) => {
     //     console.error("Encryption/decryption error:", err);
     //   });
 
-    console.log(
-      "🚀 ~ file: index.jsx:208 ~ handleAddPassword ~ credentials:",
-      credentials
-    );
-
-    const ipfsHash = await pinDataToIPFS(credentials);
+    const ipfsHash = await pinDataToIPFS({
+      siteURL, password, username
+    });
 
     const { api_key, network_name, from, to, tx_data, value, auth } =
       generateTxnData(ipfsHash.IpfsHash);
     console.log("IPFS hashshh", ipfsHash.IpfsHash);
 
-    // const res = await execute_raw_transaction(
-    //   api_key,
-    //   auth,
-    //   network_name,
-    //   from,
-    //   to,
-    //   tx_data,
-    //   value
-    // );
+    const res = await execute_raw_transaction(
+      api_key,
+      auth,
+      network_name,
+      from,
+      to,
+      tx_data,
+      value
+    );
 
-    // console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
+    console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
   };
   return (
     <ModalComponent modalStatus={[isModalOpen, setModalOpen]}>
@@ -240,12 +235,7 @@ const Index = ({ modalStatus, wallet, authToken }) => {
             type="text"
             placeholder="Site Name"
             onChange={(e) =>
-              setCredentials((prevCredentials) => {
-                return {
-                  siteURL: e.target.value,
-                  ...prevCredentials,
-                };
-              })
+              setSiteURL(e.target.value)
             }
           />
         </div>
@@ -254,12 +244,7 @@ const Index = ({ modalStatus, wallet, authToken }) => {
           Username :
           <input
             onChange={(e) =>
-              setCredentials((prevCredentials) => {
-                return {
-                  username: e.target.value,
-                  ...prevCredentials,
-                };
-              })
+              setUsername(e.target.value)
             }
             className=" px-3"
             type="text"
@@ -271,12 +256,7 @@ const Index = ({ modalStatus, wallet, authToken }) => {
           Password :
           <input
             onChange={(e) =>
-              setCredentials((prevCredentials) => {
-                return {
-                  password: e.target.value,
-                  ...prevCredentials,
-                };
-              })
+              setPassword(e.target.value)
             }
             className=" px-3"
             type="text"
