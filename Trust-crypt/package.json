@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
-    "@lighthouse-web3/sdk": "^0.3.0",
-    "@lit-protocol/sdk-browser": "^1.1.250",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-menubar": "^1.0.4",
@@ -22,6 +20,9 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "copy-webpack-plugin": "^11.0.0",
+    "cryptr": "^6.3.0",
+    "easy-encryption": "^0.1.1",
+    "encrypt-decrypt-library": "^1.0.5",
     "ethers": "^5.6.1",
     "install": "^0.13.0",
     "lucide-react": "^0.293.0",

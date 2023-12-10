@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import AddPassword from "@/components/AddPassword";
 import EditPassword from "@/components/EditPassword";
 import { authenticate, create_wallet } from "../../hooks/useOkto";
+import { Button } from "@/components/ui/button";
+
 const VITE_OKTO_API_KEY = import.meta.env.VITE_OKTO_API_KEY;
 const VITE_OKTO_OAUTH_ID_TOKEN = import.meta.env.VITE_OKTO_OAUTH_ID_TOKEN;
 const VITE_OKTO_PIN = import.meta.env.VITE_OKTO_PIN;
@@ -52,9 +54,11 @@ function Index() {
     <>
       <div className="w-[350px] h-[600px]">
         {!wallet ? (
-          <button type="primary" onClick={handleConnectWallet}>
-            Connect Wallet
-          </button>
+          <div className="text-center align-middle h-full">
+            <Button type="primary" onClick={handleConnectWallet}>
+              Connect Wallet
+            </Button>
+          </div>
         ) : (
           <>
             <Header setIsAddModalOpen={setIsAddModalOpen} />
@@ -67,7 +71,9 @@ function Index() {
               />
             ) : null}
             {isEditModalOpen ? (
-              <EditPassword modalStatus={[isEditModalOpen, setIsEditModalOpen]} />
+              <EditPassword
+                modalStatus={[isEditModalOpen, setIsEditModalOpen]}
+              />
             ) : null}
           </>
         )}

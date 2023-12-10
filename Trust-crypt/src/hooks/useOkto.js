@@ -68,16 +68,6 @@ export async function execute_raw_transaction(
   tx_data,
   value
 ) {
-  console.log(
-    "within the OKto functuion",
-    auth,
-    network_name,
-    from,
-    to,
-    tx_data,
-    value,
-    api_key
-  );
   const { data } = await axios.post(
     `https://3p-bff.oktostage.com/api/v1/rawtransaction/execute`,
     {

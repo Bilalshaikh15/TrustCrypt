@@ -2,6 +2,8 @@ import ModalComponent from "../Modal";
 import { ethers } from "ethers";
 import { execute_raw_transaction } from "../../hooks/useOkto";
 import { useState } from "react";
+import { encryptText, decryptText } from "../../lib/encrypt-decrypt";
+
 const contractABI = [
   {
     anonymous: false,
@@ -147,7 +149,6 @@ const contractABI = [
     type: "function",
   },
 ];
-
 const Index = ({ modalStatus, wallet, authToken }) => {
   const [isModalOpen, setModalOpen] = modalStatus;
   const [credentials, setCredentials] = useState({
@@ -155,14 +156,13 @@ const Index = ({ modalStatus, wallet, authToken }) => {
     username: null,
     password: null,
   });
+
   // console.log("wallet ===", wallet);
-  const generateTxnData = async () => {
+  const generateTxnData = (ipfsHash) => {
     // Encode the function call
     const iface = new ethers.utils.Interface(contractABI);
 
-    const generatedTxData = iface.encodeFunctionData("addKey", [
-      "QmSQycdNs3vMhQ6zSzzKteAW8k2xwA8oXc5Ks9VunBDW97",
-    ]);
+    const generatedTxData = iface.encodeFunctionData("addKey", [ipfsHash]);
 
     const transactionData = {
       api_key: import.meta.env.VITE_OKTO_API_KEY,
@@ -175,24 +175,58 @@ const Index = ({ modalStatus, wallet, authToken }) => {
     };
     return transactionData;
   };
-
+  const pinDataToIPFS = async (data) => {
+    const response = await fetch(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          pinata_api_key: import.meta.env.VITE_PUBLIC_PINATA_API_KEY,
+          pinata_secret_api_key: import.meta.env
+            .VITE_PUBLIC_PINATA_API_SECRET_KEY,
+        },
+        body: JSON.stringify(data),
+      }
+    );
+    return response.json();
+  };
   const handleAddPassword = async () => {
-    // TODO: remove auth hardcoded
-    const { api_key, network_name, from, to, tx_data, value, auth } =
-      await generateTxnData();
-    console.log("🚀  beforeeeee:");
+    // const textToEncrypt = "This is a secret message.";
+    // encryptText(textToEncrypt)
+    //   .then((encrypted) => {
+    //     console.log("Encrypted:", encrypted.ciphertext);
+    //     return decryptText(encrypted.ciphertext, "secretKey");
+    //   })
+    //   .then((decrypted) => {
+    //     console.log("Decrypted:", decrypted);
+    //   })
+    //   .catch((err) => {
+    //     console.error("Encryption/decryption error:", err);
+    //   });
 
-    const res = await execute_raw_transaction(
-      api_key,
-      auth,
-      network_name,
-      from,
-      to,
-      tx_data,
-      value
+    console.log(
+      "🚀 ~ file: index.jsx:208 ~ handleAddPassword ~ credentials:",
+      credentials
     );
 
-    console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
+    const ipfsHash = await pinDataToIPFS(credentials);
+
+    const { api_key, network_name, from, to, tx_data, value, auth } =
+      generateTxnData(ipfsHash.IpfsHash);
+    console.log("IPFS hashshh", ipfsHash.IpfsHash);
+
+    // const res = await execute_raw_transaction(
+    //   api_key,
+    //   auth,
+    //   network_name,
+    //   from,
+    //   to,
+    //   tx_data,
+    //   value
+    // );
+
+    // console.log("🚀 ~ file: index.jsx:61 ~ handleAddPassword ~ res:", res);
   };
   return (
     <ModalComponent modalStatus={[isModalOpen, setModalOpen]}>
@@ -206,9 +240,11 @@ const Index = ({ modalStatus, wallet, authToken }) => {
             type="text"
             placeholder="Site Name"
             onChange={(e) =>
-              setCredentials({
-                siteURL: e.target.value,
-                ...credentials,
+              setCredentials((prevCredentials) => {
+                return {
+                  siteURL: e.target.value,
+                  ...prevCredentials,
+                };
               })
             }
           />
@@ -218,9 +254,11 @@ const Index = ({ modalStatus, wallet, authToken }) => {
           Username :
           <input
             onChange={(e) =>
-              setCredentials({
-                username: e.target.value,
-                ...credentials,
+              setCredentials((prevCredentials) => {
+                return {
+                  username: e.target.value,
+                  ...prevCredentials,
+                };
               })
             }
             className=" px-3"
@@ -233,9 +271,11 @@ const Index = ({ modalStatus, wallet, authToken }) => {
           Password :
           <input
             onChange={(e) =>
-              setCredentials({
-                password: e.target.value,
-                ...credentials,
+              setCredentials((prevCredentials) => {
+                return {
+                  password: e.target.value,
+                  ...prevCredentials,
+                };
               })
             }
             className=" px-3"

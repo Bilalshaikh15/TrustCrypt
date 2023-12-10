@@ -1,5 +1,6 @@
-import LitJsSdk from "@lit-protocol/sdk-browser";
+// import LitJsSdk from "@lit-protocol/sdk-browser";
 import lighthouse from "@lighthouse-web3/sdk";
+import * as LitJsSdk from "@lit-protocol/lit-node-client";
 
 const client = new LitJsSdk.LitNodeClient({ debug: false });
 
@@ -20,7 +21,14 @@ class Lit {
       await this.connect();
     }
     console.log("before authsig");
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "mumbai" });
+    // const authSig = await LitJsSdk.checkAndSignAuthMessage({ chain: "mumbai" });
+    let authSig = {
+      sig: "0xb9947846a09b1c393250ccd77329fbe02b64e9b9de79cbc4…3e20e5b835c3ba0b14d1532e59ab3ea798a8904f8b7b2a41b",
+      derivedVia: "web3.eth.personal.sign",
+      signedMessage:
+        "localhost:3000 wants you to sign in with your Ethe…wJFfLSGt4ukDm\nIssued At: 2023-12-02T19:37:25.585Z",
+      address: "0x66f877f485c296b2170868734e10585420e4e887",
+    };
     console.log(
       "🚀 ~ file: lit.js:23 ~ Lit ~ encryptString ~ authSig:",
       authSig
@@ -29,7 +37,7 @@ class Lit {
     const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(
       stringToEncrypt
     );
-
+    ``;
     // save encryption key to nodes
     const encryptedSymmetricKey = await this.litNodeClient.saveEncryptionKey({
       accessControlConditions,
@@ -99,10 +107,3 @@ class Lit {
 }
 
 export default Lit;
-
-const c = new Lit(true);
-
-c.encryptStringLightHouse(
-  "I am Harsha",
-  "0x66F877f485C296b2170868734E10585420E4e887"
-);
